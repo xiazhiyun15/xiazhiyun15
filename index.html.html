@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夏天的风 · 胡玉涛</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --sea-deep: #0a2a43;
+    --sea-mid: #1565a0;
+    --sea-light: #4fb8d8;
+    --foam: #e8f6fb;
+    --sand: #f5efe6;
+    --text-main: #12314a;
+    --text-soft: #4a6d85;
+    --glow: rgba(79, 184, 216, 0.45);
+    --radius: 20px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB",
+      -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--text-main);
+    line-height: 1.7;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #7fd0e8 0%, #4ba3cf 35%, #1c6ea4 70%, #0a2a43 100%);
+    background-attachment: fixed;
+  }
+
+  .wave-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .wave {
+    position: absolute;
+    left: -50%;
+    width: 200%;
+    height: 220px;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 45%;
+    opacity: 0.55;
+    animation: drift 18s linear infinite;
+  }
+  .wave.w1 { bottom: 8%;  animation-duration: 20s; opacity: 0.45; }
+  .wave.w2 { bottom: 2%;  animation-duration: 28s; animation-direction: reverse; opacity: 0.3; }
+  .wave.w3 { bottom: -4%; animation-duration: 34s; opacity: 0.22; }
+
+  @keyframes drift {
+    0%   { transform: translateX(-6%) rotate(0deg); }
+    50%  { transform: translateX(6%)  rotate(3deg); }
+    100% { transform: translateX(-6%) rotate(0deg); }
+  }
+
+  .bubble {
+    position: absolute;
+    bottom: -80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.08) 65%, rgba(255,255,255,0) 75%);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    animation: rise linear infinite;
+  }
+
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+    12%  { opacity: 0.9; }
+    55%  { transform: translateY(-52vh) translateX(24px) scale(1); }
+    88%  { opacity: 0.7; }
+    100% { transform: translateY(-112vh) translateX(-14px) scale(1.1); opacity: 0; }
+  }
+
+  .sun-glow {
+    position: absolute;
+    top: -18vh;
+    right: -12vw;
+    width: 60vw;
+    max-width: 760px;
+    aspect-ratio: 1;
+    background: radial-gradient(circle, rgba(255,245,200,0.55) 0%, rgba(255,240,190,0.18) 40%, rgba(255,255,255,0) 68%);
+    animation: breathe 9s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1);    opacity: 0.85; }
+    50%      { transform: scale(1.12); opacity: 1; }
+  }
+
+  .sound-toggle {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--sea-mid), var(--sea-light));
+    box-shadow: 0 12px 30px rgba(4, 32, 56, 0.4);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, opacity 0.35s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sound-toggle:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 18px 40px rgba(4, 32, 56, 0.5); }
+  .sound-toggle:active { transform: translateY(-1px) scale(0.98); }
+
+  .sound-toggle svg {
+    width: 20px; height: 20px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  .sound-toggle.playing svg { animation: soundPulse 1.6s ease-in-out infinite; }
+
+  @keyframes soundPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.16); }
+  }
+
+  .sound-bars { display: none; align-items: flex-end; gap: 2.5px; height: 16px; }
+  .sound-toggle.playing .sound-bars { display: flex; }
+  .sound-toggle.playing .sound-icon-hidden { display: none; }
+
+  .sound-bars i {
+    display: block; width: 3px;
+    background: #fff; border-radius: 2px;
+    animation: barWave 0.9s ease-in-out infinite;
+  }
+  .sound-bars i:nth-child(1) { height: 7px;  animation-delay: 0s; }
+  .sound-bars i:nth-child(2) { height: 15px; animation-delay: 0.15s; }
+  .sound-bars i:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+  .sound-bars i:nth-child(4) { height: 15px; animation-delay: 0.45s; }
+
+  @keyframes barWave {
+    0%, 100% { transform: scaleY(0.45); }
+    50%      { transform: scaleY(1.2); }
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 64px 22px 80px;
+  }
+
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 48px 44px;
+    border-radius: 30px;
+    background: linear-gradient(140deg, rgba(255,255,255,0.94), rgba(233,246,252,0.86));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 24px 60px rgba(4, 32, 56, 0.28);
+    animation: fadeUp 0.9s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .avatar-wrap { position: relative; flex-shrink: 0; width: 158px; height: 158px; }
+
+  .avatar {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 34px rgba(10, 42, 67, 0.32);
+    position: relative; z-index: 2;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+    display: block;
+  }
+
+  .avatar-wrap:hover .avatar {
+    transform: scale(1.07) rotate(-2.5deg);
+    box-shadow: 0 18px 44px rgba(10, 42, 67, 0.42);
+  }
+
+  .avatar-ring {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #4fb8d8, #7fd0e8, #e8f6fb, #4fb8d8);
+    z-index: 1; opacity: 0.85; filter: blur(1px);
+    animation: spin 7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .avatar-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 1;
+  }
+
+  .ring-mask {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 1;
+  }
+
+  .hero-text { flex: 1; min-width: 0; }
+
+  .name {
+    font-size: clamp(1.8rem, 4.4vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--sea-deep);
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;
+  }
+
+  .name-en {
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--sea-light);
+    text-transform: uppercase;
+  }
+
+  .signature {
+    margin-top: 14px;
+    font-size: clamp(1rem, 2.5vw, 1.18rem);
+    color: var(--sea-mid);
+    font-weight: 600;
+    padding-left: 14px;
+    border-left: 4px solid var(--sea-light);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .signature::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+    animation: shimmer 4.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%   { left: -100%; }
+    55%  { left: 130%; }
+    100% { left: 130%; }
+  }
+
+  .hero-tags { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .role-chip {
+    font-size: 0.85rem;
+    padding: 6px 15px;
+    border-radius: 999px;
+    background: rgba(79, 184, 216, 0.14);
+    color: var(--sea-mid);
+    border: 1px solid rgba(79, 184, 216, 0.4);
+    transition: all 0.35s ease;
+  }
+
+  .role-chip:hover {
+    background: var(--sea-mid);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px var(--glow);
+  }
+
+  .card {
+    margin-top: 34px;
+    padding: 38px 40px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 16px 44px rgba(4, 32, 56, 0.2);
+    animation: fadeUp 0.9s ease both;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+  }
+
+  .card:hover { transform: translateY(-7px); box-shadow: 0 26px 60px rgba(4, 32, 56, 0.3); }
+
+  .card-title {
+    font-size: 1.22rem;
+    font-weight: 800;
+    color: var(--sea-deep);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 11px;
+  }
+
+  .card-title .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sea-light), var(--sea-mid));
+    box-shadow: 0 0 0 5px rgba(79, 184, 216, 0.16);
+    flex-shrink: 0;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 5px rgba(79, 184, 216, 0.16); }
+    50%      { box-shadow: 0 0 0 10px rgba(79, 184, 216, 0.05); }
+  }
+
+  .about p { color: var(--text-soft); font-size: 1.02rem; }
+  .about p + p { margin-top: 14px; }
+
+  .highlight {
+    color: var(--sea-mid);
+    font-weight: 700;
+    background: linear-gradient(180deg, transparent 62%, rgba(79, 184, 216, 0.32) 62%);
+    padding: 0 2px;
+  }
+
+  /* ===== 游戏板块 ===== */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .game-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 24px 22px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(79,184,216,0.1), rgba(79,184,216,0.02));
+    border: 1px solid rgba(79, 184, 216, 0.28);
+    overflow: hidden;
+    transition: all 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 悬停时从左到右扫过的光带 */
+  .game-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.65), transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  .game-item:hover::before { transform: translateX(120%); }
+
+  .game-item:hover {
+    transform: translateY(-6px);
+    background: linear-gradient(135deg, var(--sea-mid), var(--sea-light));
+    border-color: transparent;
+    box-shadow: 0 18px 38px var(--glow);
+  }
+
+  .game-badge {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    box-shadow: 0 8px 20px rgba(4, 32, 56, 0.22);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .game-item:hover .game-badge { transform: rotate(-8deg) scale(1.1); }
+
+  /* 王者荣耀徽章配色 */
+  .badge-wzry {
+    background: linear-gradient(135deg, #f0a52a, #d8552a);
+  }
+
+  /* 金铲铲之战徽章配色 */
+  .badge-jcc {
+    background: linear-gradient(135deg, #6b4bd8, #3d2a99);
+  }
+
+  .game-info { position: relative; z-index: 1; min-width: 0; }
+
+  .game-name {
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: var(--sea-deep);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    transition: color 0.42s ease;
+  }
+
+  .game-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(79, 184, 216, 0.18);
+    color: var(--sea-mid);
+    letter-spacing: 0.5px;
+    transition: all 0.42s ease;
+  }
+
+  .game-desc {
+    margin-top: 8px;
+    font-size: 0.94rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    transition: color 0.42s ease;
+  }
+
+  .game-item:hover .game-name,
+  .game-item:hover .game-desc { color: #fff; }
+
+  .game-item:hover .game-tag {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+  }
+
+  .skills { display: flex; flex-wrap: wrap; gap: 13px; }
+
+  .skill {
+    position: relative;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 999px;
+    color: var(--sea-mid);
+    background: #fff;
+    border: 1.5px solid rgba(79, 184, 216, 0.45);
+    cursor: default;
+    overflow: hidden;
+    transition: color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+
+  .skill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--sea-mid), var(--sea-light));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: -1;
+  }
+
+  .skill span { position: relative; z-index: 1; }
+
+  .skill:hover {
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 14px 30px var(--glow);
+  }
+
+  .skill:hover::before { transform: scaleX(1); }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(79,184,216,0.1), rgba(79,184,216,0.02));
+    border: 1px solid rgba(79, 184, 216, 0.28);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .contact-item:hover {
+    background: linear-gradient(135deg, var(--sea-mid), var(--sea-light));
+    transform: translateY(-6px);
+    box-shadow: 0 18px 38px var(--glow);
+    border-color: transparent;
+  }
+
+  .contact-icon {
+    width: 46px; height: 46px; flex-shrink: 0;
+    border-radius: 13px;
+    display: grid; place-items: center;
+    background: rgba(79, 184, 216, 0.18);
+    transition: background 0.42s ease, transform 0.42s ease;
+  }
+
+  .contact-icon svg {
+    width: 23px; height: 23px;
+    stroke: var(--sea-mid); fill: none;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke 0.42s ease;
+  }
+
+  .contact-item:hover .contact-icon { background: rgba(255, 255, 255, 0.22); transform: rotate(-8deg) scale(1.08); }
+  .contact-item:hover .contact-icon svg { stroke: #fff; }
+
+  .contact-label {
+    font-size: 0.78rem;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 700;
+    transition: color 0.42s ease;
+  }
+
+  .contact-value {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--sea-deep);
+    word-break: break-all;
+    transition: color 0.42s ease;
+  }
+
+  .contact-item:hover .contact-label,
+  .contact-item:hover .contact-value { color: #fff; }
+
+  footer {
+    margin-top: 46px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    letter-spacing: 0.6px;
+    text-shadow: 0 2px 10px rgba(10, 42, 67, 0.45);
+    animation: fadeUp 1s ease both;
+  }
+
+  footer .wind { display: inline-block; animation: sway 3.6s ease-in-out infinite; }
+
+  @keyframes sway {
+    0%, 100% { transform: translateX(-4px) rotate(-4deg); }
+    50%      { transform: translateX(4px)  rotate(4deg); }
+  }
+
+  @media (max-width: 820px) {
+    .hero { flex-direction: column; text-align: center; gap: 30px; padding: 40px 26px; border-radius: 26px; }
+    .name { justify-content: center; }
+    .signature { text-align: left; display: inline-block; }
+    .hero-tags { justify-content: center; }
+    .card { padding: 32px 26px; }
+    .card-title { justify-content: center; }
+    .about { text-align: center; }
+    .skills { justify-content: center; }
+  }
+
+  @media (max-width: 520px) {
+    .page { padding: 40px 14px 60px; }
+    .avatar-wrap { width: 128px; height: 128px; }
+    .hero { padding: 34px 20px; }
+    .card { padding: 28px 20px; margin-top: 24px; }
+    .skill { padding: 9px 18px; font-size: 0.9rem; }
+    .contact-item { padding: 16px 16px; gap: 13px; }
+    .contact-value { font-size: 0.95rem; }
+    .contact-icon { width: 42px; height: 42px; }
+    .sound-toggle { right: 14px; bottom: 14px; padding: 11px 17px; font-size: 0.86rem; }
+    .game-item { padding: 20px 16px; gap: 14px; }
+    .game-badge { width: 50px; height: 50px; font-size: 1.3rem; border-radius: 14px; }
+    .game-name { font-size: 1rem; }
+    .game-desc { font-size: 0.9rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wave-bg" aria-hidden="true">
+  <div class="sun-glow"></div>
+  <div class="wave w1"></div>
+  <div class="wave w2"></div>
+  <div class="wave w3"></div>
+  <div id="bubbles"></div>
+</div>
+
+<button class="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="开启海的声音">
+  <svg class="sound-icon-hidden" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M11 5 6 9H2v6h4l5 4z"/>
+    <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+    <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+  </svg>
+  <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <span id="soundLabel">听海</span>
+</button>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="ring-mask"></div>
+      <img
+        class="avatar"
+        src="https://aimp-as-image-1257466817.cos.ap-beijing.myqcloud.com/2026/10/19/1698751392304ced81db58e1e350b4d7.jpg?q-sign-algorithm=sha1&q-ak=AKIDmY4JI1UgcIhrkNjodCUWHm0xe4E8l8E4&q-sign-time=1792401231%3B1823505231&q-key-time=1792401231%3B1823505231&q-header-list=host&q-url-param-list=time&q-signature=760b4cd445be84ec506d570ede3dd1b5dc472bde&time=1792401231624"
+        alt="胡玉涛的头像"
+      >
+    </div>
+
+    <div class="hero-text">
+      <h1 class="name">
+        胡玉涛
+        <span class="name-en">Summer Wind</span>
+      </h1>
+      <p class="signature">错过黄昏晚霞，还有漫天星辰</p>
+      <div class="hero-tags">
+        <span class="role-chip">网名 · 夏天的风</span>
+        <span class="role-chip">追风的人</span>
+        <span class="role-chip">代码爱好者</span>
+        <span class="role-chip">游戏玩家</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="card about">
+    <h2 class="card-title"><span class="dot"></span>关于我</h2>
+    <p>你好，我是 <span class="highlight">胡玉涛</span>，网名 <span class="highlight">夏天的风</span>。</p>
+    <p>我希望像风一样自由，不受拘束地穿过每一片原野与海面；也愿如夏天徐徐微风般，温柔而坚定，给身边的人带去一点清爽与暖意。</p>
+    <p>喜欢蓝色的天空、翻涌的浪花，还有写代码时那种安静又专注的心流。</p>
+  </section>
+
+  <!-- ========== 游戏板块 ========== -->
+  <section class="card">
+    <h2 class="card-title"><span class="dot"></span>主玩游戏</h2>
+    <div class="games-grid">
+
+      <div class="game-item">
+        <div class="game-badge badge-wzry">王</div>
+        <div class="game-info">
+          <div class="game-name">
+            王者荣耀
+            <span class="game-tag">MOBA</span>
+          </div>
+          <p class="game-desc">
+            五人对战、推塔开黑。喜欢和队友默契配合、逆风翻盘的瞬间，
+            也享受每一局全新的战术博弈。
+          </p>
+        </div>
+      </div>
+
+      <div class="game-item">
+        <div class="game-badge badge-jcc">铲</div>
+        <div class="game-info">
+          <div class="game-name">
+            金铲铲之战
+            <span class="game-tag">自走棋</span>
+          </div>
+          <p class="game-desc">
+            一局一局攒阵容、调经济、追三星。考验的是运营思路和临场取舍，
+            安静地盘算，也很上头。
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title"><span class="dot"></span>技能标签</h2>
+    <div class="skills">
+      <span class="skill"><span>Python</span></span>
+      <span class="skill"><span>Git</span></span>
+      <span class="skill"><span>SQL</span></span>
+      <span class="skill"><span>Linux</span></span>
+      <span class="skill"><span>HTML / CSS</span></span>
+      <span class="skill"><span>JavaScript</span></span>
+      <span class="skill"><span>数据分析</span></span>
+      <span class="skill"><span>自动化脚本</span></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title"><span class="dot"></span>联系方式</h2>
+    <div class="contact-grid">
+      <a class="contact-item" href="tel:15124209703">
+        <span class="contact-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>
+          </svg>
+        </span>
+        <span>
+          <span class="contact-label">Phone</span><br>
+          <span class="contact-value">15124209703</span>
+        </span>
+      </a>
+
+      <a class="contact-item" href="mailto:2864349318@qq.com">
+        <span class="contact-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M2.5 6.5 12 13l9.5-6.5"/>
+          </svg>
+        </span>
+        <span>
+          <span class="contact-label">Email</span><br>
+          <span class="contact-value">2864349318@qq.com</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    愿你我都像夏天的风 <span class="wind">🌊</span> 自由、温柔、不停歇
+  </footer>
+
+</div>
+
+<script>
+  /* ========== 背景气泡 ========== */
+  (function () {
+    var container = document.getElementById('bubbles');
+    if (!container) return;
+    var count = window.innerWidth < 600 ? 10 : 18;
+    var frag = document.createDocumentFragment();
+
+    for (var i = 0; i < count; i++) {
+      var b = document.createElement('span');
+      b.className = 'bubble';
+      var size = 6 + Math.random() * 26;
+      b.style.width = size + 'px';
+      b.style.height = size + 'px';
+      b.style.left = Math.random() * 100 + '%';
+      b.style.animationDuration = (11 + Math.random() * 14).toFixed(2) + 's';
+      b.style.animationDelay = (-Math.random() * 20).toFixed(2) + 's';
+      frag.appendChild(b);
+    }
+    container.appendChild(frag);
+  })();
+
+  /* ========== 海的声音：浪 + 风 + 水流 + 海鸥（纯 Web Audio 合成） ========== */
+  (function () {
+    var btn = document.getElementById('soundToggle');
+    var label = document.getElementById('soundLabel');
+    if (!btn) return;
+
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) {
+      btn.style.display = 'none';
+      return;
+    }
+
+    var ctx = null;
+    var master = null;
+    var seaBus = null;
+    var windBus = null;
+    var waterBus = null;
+    var gullBus = null;
+    var playing = false;
+    var noiseBuffer = null;
+    var gullTimer = null;
+    var seaNodes = [];
+
+    /* ===== 音量平衡（调这几个数字即可整体调整）===== */
+    var MASTER_VOLUME = 0.42;
+    var SEA_LEVEL     = 1.0;
+    var WIND_LEVEL    = 0.9;
+    var WATER_LEVEL   = 0.8;
+    var GULL_LEVEL    = 1.15;
+
+    function createNoiseBuffer() {
+      var len = ctx.sampleRate * 4;
+      var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      return buf;
+    }
+
+    function createPinkishBuffer() {
+      var len = ctx.sampleRate * 4;
+      var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (var i = 0; i < len; i++) {
+        var white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+      return buf;
+    }
+
+    function createWaveLFO(param, base, depth, period, phase) {
+      var lfo = ctx.createOscillator();
+      var lfoGain = ctx.createGain();
+      lfo.type = 'sine';
+      lfo.frequency.value = 1 / period;
+      param.value = base;
+      lfoGain.gain.value = depth;
+      lfo.connect(lfoGain);
+      lfoGain.connect(param);
+      lfo.start(ctx.currentTime + (phase || 0));
+      return lfo;
+    }
+
+    /* ---------- 1. 轻拍沙滩的海浪 ---------- */
+    function buildSea() {
+      seaBus = ctx.createGain();
+      seaBus.gain.value = SEA_LEVEL;
+      seaBus.connect(master);
+
+      noiseBuffer = createNoiseBuffer();
+      var pinkBuffer = createPinkishBuffer();
+      var nodes = [];
+
+      var bed = ctx.createBufferSource();
+      bed.buffer = pinkBuffer;
+      bed.loop = true;
+      var bedLP = ctx.createBiquadFilter();
+      bedLP.type = 'lowpass';
+      bedLP.frequency.value = 300;
+      bedLP.Q.value = 0.6;
+      var bedGain = ctx.createGain();
+      bedGain.gain.value = 0.10;
+      bed.connect(bedLP); bedLP.connect(bedGain); bedGain.connect(seaBus);
+      bed.start(); nodes.push(bed);
+      createWaveLFO(bedGain.gain, 0.10, 0.06, 12, 0);
+
+      var wash = ctx.createBufferSource();
+      wash.buffer = noiseBuffer;
+      wash.loop = true;
+      wash.playbackRate.value = 0.95;
+      var washBP = ctx.createBiquadFilter();
+      washBP.type = 'bandpass';
+      washBP.frequency.value = 1500;
+      washBP.Q.value = 0.7;
+      var washGain = ctx.createGain();
+      washGain.gain.value = 0.085;
+      wash.connect(washBP); washBP.connect(washGain); washGain.connect(seaBus);
+      wash.start(); nodes.push(wash);
+      createWaveLFO(washGain.gain, 0.085, 0.06, 5.5, 1.2);
+
+      var foam = ctx.createBufferSource();
+      foam.buffer = noiseBuffer;
+      foam.loop = true;
+      foam.playbackRate.value = 1.05;
+      var foamHP = ctx.createBiquadFilter();
+      foamHP.type = 'highpass';
+      foamHP.frequency.value = 1800;
+      var foamGain = ctx.createGain();
+      foamGain.gain.value = 0.05;
+      foam.connect(foamHP); foamHP.connect(foamGain); foamGain.connect(seaBus);
+      foam.start(); nodes.push(foam);
+      createWaveLFO(foamGain.gain, 0.05, 0.032, 3.6, 0.6);
+
+      return nodes;
+    }
+
+    /* ---------- 2. 轻轻的海风 ---------- */
+    function buildWind() {
+      windBus = ctx.createGain();
+      windBus.gain.value = WIND_LEVEL;
+      windBus.connect(master);
+
+      var pinkBuffer = createPinkishBuffer();
+      var nodes = [];
+
+      var wind = ctx.createBufferSource();
+      wind.buffer = pinkBuffer;
+      wind.loop = true;
+      var windLP = ctx.createBiquadFilter();
+      windLP.type = 'lowpass';
+      windLP.frequency.value = 700;
+      windLP.Q.value = 0.5;
+      var windGain = ctx.createGain();
+      windGain.gain.value = 0.05;
+      wind.connect(windLP); windLP.connect(windGain); windGain.connect(windBus);
+      wind.start(); nodes.push(wind);
+      createWaveLFO(windGain.gain, 0.05, 0.035, 11, 2.0);
+
+      var breeze = ctx.createBufferSource();
+      breeze.buffer = noiseBuffer;
+      breeze.loop = true;
+      var breezeBP = ctx.createBiquadFilter();
+      breezeBP.type = 'bandpass';
+      breezeBP.frequency.value = 900;
+      breezeBP.Q.value = 0.55;
+      var breezeGain = ctx.createGain();
+      breezeGain.gain.value = 0.018;
+      breeze.connect(breezeBP); breezeBP.connect(breezeGain); breezeGain.connect(windBus);
+      breeze.start(); nodes.push(breeze);
+      createWaveLFO(breezeGain.gain, 0.018, 0.014, 7.5, 3.4);
+
+      return nodes;
+    }
+
+    /* ---------- 3. 水流感 ---------- */
+    function buildWater() {
+      waterBus = ctx.createGain();
+      waterBus.gain.value = WATER_LEVEL;
+      waterBus.connect(master);
+
+      noiseBuffer = noiseBuffer || createNoiseBuffer();
+      var nodes = [];
+
+      var flow = ctx.createBufferSource();
+      flow.buffer = noiseBuffer;
+      flow.loop = true;
+      flow.playbackRate.value = 1.2;
+
+      var flowBP = ctx.createBiquadFilter();
+      flowBP.type = 'bandpass';
+      flowBP.frequency.value = 900;
+      flowBP.Q.value = 1.1;
+
+      var flowGain = ctx.createGain();
+      flowGain.gain.value = 0.038;
+
+      flow.connect(flowBP); flowBP.connect(flowGain); flowGain.connect(waterBus);
+      flow.start(); nodes.push(flow);
+
+      var sweepLFO = ctx.createOscillator();
+      var sweepGain = ctx.createGain();
+      sweepLFO.type = 'sine';
+      sweepLFO.frequency.value = 0.09;
+      sweepGain.gain.value = 380;
+      sweepLFO.connect(sweepGain);
+      sweepGain.connect(flowBP.frequency);
+      sweepLFO.start();
+      nodes.push(sweepLFO);
+
+      createWaveLFO(flowGain.gain, 0.038, 0.02, 8.5, 1.0);
+
+      var drips = ctx.createBufferSource();
+      drips.buffer = noiseBuffer;
+      drips.loop = true;
+      drips.playbackRate.value = 1.6;
+      var dripHP = ctx.createBiquadFilter();
+      dripHP.type = 'highpass';
+      dripHP.frequency.value = 3600;
+      var dripGain = ctx.createGain();
+      dripGain.gain.value = 0.012;
+      drips.connect(dripHP); dripHP.connect(dripGain); dripGain.connect(waterBus);
+      drips.start(); nodes.push(drips);
+      createWaveLFO(dripGain.gain, 0.012, 0.01, 2.8, 0.4);
+
+      return nodes;
+    }
+
+    /* ---------- 4. 海鸥：清脆透亮 ---------- */
+    function playGullCall(pan, pitchShift, loudness) {
+      if (!playing || !ctx) return;
+
+      var t0 = ctx.currentTime + 0.02;
+      var calls = Math.random() < 0.45 ? 3 : 2;
+      var baseFreq = (1650 + Math.random() * 330) * pitchShift;
+
+      var gullOut = ctx.createGain();
+      gullOut.gain.value = loudness * GULL_LEVEL;
+
+      var gullHP = ctx.createBiquadFilter();
+      gullHP.type = 'highpass';
+      gullHP.frequency.value = 1100;
+      gullHP.Q.value = 0.7;
+      gullOut.connect(gullHP);
+
+      var panner = null;
+      if (ctx.createStereoPanner) {
+        panner = ctx.createStereoPanner();
+        panner.pan.value = pan;
+        gullHP.connect(panner);
+        panner.connect(gullBus);
+      } else {
+        gullHP.connect(gullBus);
+      }
+
+      for (var i = 0; i < calls; i++) {
+        var start = t0 + i * (0.17 + Math.random() * 0.07);
+        var dur = 0.13 + Math.random() * 0.05;
+
+        var osc = ctx.createOscillator();
+        osc.type = 'sine';
+        var f1 = baseFreq * (1 - i * 0.045);
+        var f2 = f1 * 0.55;
+        osc.frequency.setValueAtTime(f1 * 0.82, start);
+        osc.frequency.exponentialRampToValueAtTime(f1, start + 0.035);
+        osc.frequency.exponentialRampToValueAtTime(f2, start + dur);
+
+        var osc2 = ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(f1 * 1.5, start);
+        osc2.frequency.exponentialRampToValueAtTime(f2 * 1.6, start + dur);
+        var osc2Gain = ctx.createGain();
+        osc2Gain.gain.value = 0.28;
+
+        var bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.setValueAtTime(f1 * 0.95, start);
+        bp.frequency.exponentialRampToValueAtTime(f2 * 1.1, start + dur);
+        bp.Q.value = 4;
+
+        var env = ctx.createGain();
+        env.gain.setValueAtTime(0.0001, start);
+        env.gain.exponentialRampToValueAtTime(0.62, start + 0.015);
+        env.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+        var air = ctx.createBufferSource();
+        air.buffer = noiseBuffer;
+        air.loop = true;
+        var airHP = ctx.createBiquadFilter();
+        airHP.type = 'highpass';
+        airHP.frequency.value = 2200;
+        var airGain = ctx.createGain();
+        airGain.gain.setValueAtTime(0.0001, start);
+        airGain.gain.exponentialRampToValueAtTime(0.05, start + 0.015);
+        airGain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+        osc.connect(bp);
+        osc2.connect(osc2Gain);
+        osc2Gain.connect(bp);
+        bp.connect(env);
+        env.connect(gullOut);
+
+        air.connect(airHP);
+        airHP.connect(airGain);
+        airGain.connect(gullOut);
+
+        osc.start(start);  osc.stop(start + dur + 0.05);
+        osc2.start(start); osc2.stop(start + dur + 0.05);
+        air.start(start);  air.stop(start + dur + 0.05);
+      }
+    }
+
+    function scheduleGull() {
+      var delay = 2000 + Math.random() * 4000;
+      gullTimer = setTimeout(function () {
+        if (!playing) return;
+        var pan = (Math.random() * 2 - 1) * 0.75;
+        var pitchShift = 0.88 + Math.random() * 0.3;
+        var loudness = 0.22 + Math.random() * 0.2;
+        playGullCall(pan, pitchShift, loudness);
+        if (Math.random() < 0.3) {
+          setTimeout(function () {
+            playGullCall((Math.random() * 2 - 1) * 0.85,
+                         0.92 + Math.random() * 0.28,
+                         0.14 + Math.random() * 0.12);
+          }, 400 + Math.random() * 900);
+        }
+        scheduleGull();
+      }, delay);
+    }
+
+    function fadeTo(target, seconds) {
+      var now = ctx.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), now);
+      master.gain.linearRampToValueAtTime(target, now + seconds);
+    }
+
+    function start() {
+      if (!ctx) { ctx = new AudioCtx(); }
+      if (ctx.state === 'suspended') { ctx.resume(); }
+
+      if (!master) {
+        master = ctx.createGain();
+        master.gain.value = 0.0001;
+        master.connect(ctx.destination);
+
+        gullBus = ctx.createGain();
+        gullBus.gain.value = 1;
+        gullBus.connect(master);
+
+        seaNodes = buildSea();
+        seaNodes = seaNodes.concat(buildWind());
+        seaNodes = seaNodes.concat(buildWater());
+      }
+
+      fadeTo(MASTER_VOLUME, 1.8);
+      playing = true;
+      scheduleGull();
+
+      btn.classList.add('playing');
+      btn.setAttribute('aria-pressed', 'true');
+      btn.setAttribute('aria-label', '关闭海的声音');
+      label.textContent = '海风中';
+    }
+
+    function stop() {
+      if (!ctx) return;
+      playing = false;
+      if (gullTimer) { clearTimeout(gullTimer); gullTimer = null; }
+      fadeTo(0, 1.0);
+      btn.classList.remove('playing');
+      btn.setAttribute('aria-pressed', 'false');
+      btn.setAttribute('aria-label', '开启海的声音');
+      label.textContent = '听海';
+    }
+
+    btn.addEventListener('click', function () {
+      if (playing) { stop(); } else { start(); }
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (!ctx || !playing) return;
+      if (document.hidden) {
+        fadeTo(0, 0.4);
+      } else {
+        fadeTo(MASTER_VOLUME, 0.9);
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
